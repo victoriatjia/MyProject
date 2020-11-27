@@ -1,0 +1,269 @@
+<html>
+
+<head>
+	<style>
+		.pad10{
+			padding: 10px 100px 10px 100px
+		}
+		.pad20{
+			padding: 10px 100px 20px 100px
+		}
+	</style>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Read - Patient's Data</title>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" /> 
+	<script src="FormToXML.js"></script>
+</head>
+   
+<body>
+	<header class="site-header">
+		<div class="clear"></div>
+			<div class="inner-wrap">
+
+				<div class="navbar-brand-wpz">
+					<a href="http://demo.wpzoom.com/foodica" title="Food Recipes Theme for WordPress">
+						<font size="10">Patient's Data</font>
+					</a>
+					
+				</div><!-- .navbar-brand -->
+			</div>
+		
+		<div id="mysticky-wrap" style="margin-bottom: 40px;">
+			<div id="mysticky-nav" style="top: -60px;" class="">
+				<nav class="main-navbar" role="navigation" style="">
+					<div class="inner-wrap">
+						<div id="navbar-main">
+							<div class="menu-main-container">
+								<ul id="menu-main-1" class="navbar-wpz dropdown sf-menu sf-js-enabled sf-arrows">
+									<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-106">
+										<a href="Create.html">Create</a>
+									</li>
+									<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-has-children menu-item-207">
+										<a href="Read.html">Read</a>
+									</li>
+									<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-163"><a href="Search.html">Search</a></li>
+								</ul>
+							</div>
+						</div><!-- #navbar-main -->
+					</div><!-- ./inner-wrap -->
+				</nav>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</header>	
+	
+	<table align="center">
+		<tr>
+			<td>
+				Resource :
+				<select id="resource">
+					<option>Choose</option>
+					<option>MedicationRequest</option>	
+					<option>Observation</option>
+					<option>Organization</option>	
+					<option>Patient</option>	
+				</select>	
+				<div id="selectObs"></div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			ID No. : <input type="text" name="identifier" id="identifier">  &nbsp;
+			<input type="button" value="Send" onclick="showForm()">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				API: <input size="48" type="text" name="API" id="API"><br>
+			</td>
+		</tr>
+	</table>
+	
+	<table id="Opatient" align="center" border="1"></table><br>
+	<table id="Oorganization" align="center" border="1"></table><br>
+	<table id="OMR" align="center" border="1"></table><br>
+	<table id="Oobs" align="center" border="1"></table><br>
+	<script>
+		var count=0;
+		function showForm(){
+			var txt;
+			var resourceID = document.getElementById('resource');
+			var selected = resourceID.options[resource.selectedIndex].text;
+			var IDform = document.getElementById('identifier').value;
+			
+			if (selected == 'Patient'){
+				txt = "http://203.64.84.213:20100/baseR4/Patient/" + IDform +"/";
+				document.getElementById('API').value = txt;
+			}
+			if (selected == 'Organization'){
+				txt = "http://203.64.84.213:20100/baseR4/Organization/" + IDform +"/";
+				document.getElementById('API').value = txt;
+			}
+			if (selected == 'Observation'){
+				txt = "http://203.64.84.213:20100/baseR4/Observation/" + IDform +"/";
+				document.getElementById('API').value = txt;
+				if (count==0){
+					document.getElementById('selectObs').innerHTML= 'Type : <select id="ObsType"><option>Choose</option><option>BloodPressure</option><option>BodyTemperature</option><option>Glucose</option></select>';
+				}
+				count++;
+			}
+			if (selected == 'MedicationRequest'){
+				txt = "http://203.64.84.213:20100/baseR4/MedicationRequest/" + IDform +"/";
+				document.getElementById('API').value = txt;
+			}
+			var xhttp = new XMLHttpRequest();
+                xhttp.open("GET", txt, true);
+				//xhttp.setRequestHeader("Content-type", 'text/xml');
+                xhttp.onreadystatechange = function (){
+                    if (this.readyState == 4){ 
+						showOutput(this.responseText);
+                    }
+                };
+                xhttp.send();
+		}
+		var i1=1, i2=1, i3=1, i4=1, i5=1, i6=1;
+		function showOutput(str){
+			var resourceID = document.getElementById('resource');
+			var selected = resourceID.options[resource.selectedIndex].text;
+			var jsonOBJ =JSON.parse(str);
+			
+			if (jsonOBJ.resourceType == "OperationOutcome"){
+				alert(jsonOBJ.issue[0].diagnostics);
+			}
+			else{
+				if (selected=="Patient"){
+					var table= document.getElementById("Opatient");
+					if(i1==1){
+						table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Identifier</th><th>Name</th><th>Gender</th><th>Birth Date</th></tr>';
+					}
+					var row = table.insertRow(-1);
+					row.insertCell(0).innerHTML = i1;
+					row.insertCell(1).innerHTML = jsonOBJ.id;
+					row.insertCell(2).innerHTML = jsonOBJ.identifier[0].value;
+					row.insertCell(3).innerHTML = jsonOBJ.name[0].text;
+					row.insertCell(4).innerHTML = jsonOBJ.gender;
+					row.insertCell(5).innerHTML = jsonOBJ.birthDate;
+					i1++;
+				}
+				if (selected=="Organization"){
+					var table= document.getElementById("Oorganization");
+					if(i2==1){
+						table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Organization Type</th><th>Organization Name</th><th>Contact Person</th><th>Address (Postal Code)</th></tr>';
+					}
+					var row = table.insertRow(-1);
+					row.insertCell(0).innerHTML = i2;
+					row.insertCell(1).innerHTML = jsonOBJ.id;
+					row.insertCell(2).innerHTML = jsonOBJ.type[0].text;
+					row.insertCell(3).innerHTML = jsonOBJ.name;
+					row.insertCell(4).innerHTML = '(' + jsonOBJ.telecom[0].system + ') ' + jsonOBJ.telecom[0].value;
+					row.insertCell(5).innerHTML = jsonOBJ.address[0].text + ', ' + jsonOBJ.address[0].postalCode;
+					i2++;
+				}
+				if (selected=="MedicationRequest"){
+					var table= document.getElementById("OMR");
+					if(i3==1){
+						table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Patient Category</th><th>Patient ID</th><th>Patient Name</th><th>Additional Instruction</th><th>Frequency</th><th>Routes of Drug Administration</th></tr>';
+					}
+					var row = table.insertRow(-1);
+					var elLink = document.createElement('a');
+					row.insertCell(0).innerHTML = i3;
+					row.insertCell(1).innerHTML = jsonOBJ.id;
+					row.insertCell(2).innerHTML = jsonOBJ.category[0].coding[0].code;
+					elLink.href = 'http://203.64.84.213:20100/baseR4/'+ jsonOBJ.subject.reference;
+					elLink.innerHTML = jsonOBJ.subject.reference;
+					row.insertCell(3).appendChild(elLink);
+					//row.insertCell(3).innerHTML = '<a href="http://203.64.84.213:20100/baseR4/' + jsonOBJ.subject.reference + '">' + jsonOBJ.subjects.reference + '</a>';
+					row.insertCell(4).innerHTML = jsonOBJ.subject.display;
+					row.insertCell(5).innerHTML = jsonOBJ.dosageInstruction[0].additionalInstruction[0].coding[0].display;
+					row.insertCell(6).innerHTML = jsonOBJ.dosageInstruction[0].timing.code.coding[0].display;
+					row.insertCell(7).innerHTML = jsonOBJ.dosageInstruction[0].route.coding[0].display;
+					i3++;
+				}
+				if (selected=="Observation"){
+					var obsID=document.getElementById('ObsType');
+					var selectedObs= obsID.options[ObsType.selectedIndex].text;				
+					if (selectedObs == 'BloodPressure' ){	
+						if ( jsonOBJ.code.coding[0].code == '85354-9' ){
+							var table= document.getElementById("Oobs");
+							if(i4==1){
+								table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Date</th><th>Patient ID</th><th>Patient Name</th><th>Systolic blood pressure</th><th>Diastolic blood pressure</th><th>Device ID</th></tr>';
+							}
+							var row = table.insertRow(-1);
+							var elLink = document.createElement('a');
+							var elLink1 = document.createElement('a');
+							row.insertCell(0).innerHTML = i4;
+							row.insertCell(1).innerHTML = jsonOBJ.id;
+							row.insertCell(2).innerHTML = jsonOBJ.meta.lastUpdated;
+							elLink.href = 'http://203.64.84.213:20100/baseR4/'+ jsonOBJ.subject.reference;
+							elLink.innerHTML = jsonOBJ.subject.reference;
+							row.insertCell(3).appendChild(elLink);
+							row.insertCell(4).innerHTML = jsonOBJ.subject.display;
+							row.insertCell(5).innerHTML = jsonOBJ.component[0].valueQuantity.value + jsonOBJ.component[0].valueQuantity.unit;
+							row.insertCell(6).innerHTML = jsonOBJ.component[1].valueQuantity.value + jsonOBJ.component[1].valueQuantity.unit;
+							elLink1.href = 'http://203.64.84.213:20100/baseR4/'+ jsonOBJ.device.reference;
+							elLink1.innerHTML = jsonOBJ.device.reference;
+							row.insertCell(7).appendChild(elLink1);
+							i4++;
+						}
+						else{
+							alert( jsonOBJ.id + ' exist in the type of ' + jsonOBJ.code.coding[0].display);
+						}
+					}
+					if (selectedObs == 'BodyTemperature' ){	
+						if ( jsonOBJ.code.coding[0].code == '8310-5' ){
+							var table= document.getElementById("Oobs");
+							if(i5==1){
+								table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Date</th><th>Patient ID</th><th>Patient Name</th><th>Temperature</th><th>Device ID</th></tr>';
+							}
+							var row = table.insertRow(-1);
+							var elLink = document.createElement('a');
+							var elLink1 = document.createElement('a');
+							row.insertCell(0).innerHTML = i5;
+							row.insertCell(1).innerHTML = jsonOBJ.id;
+							row.insertCell(2).innerHTML = jsonOBJ.meta.lastUpdated;
+							elLink.href = 'http://203.64.84.213:20100/baseR4/'+ jsonOBJ.subject.reference;
+							elLink.innerHTML = jsonOBJ.subject.reference;
+							row.insertCell(3).appendChild(elLink);
+							row.insertCell(4).innerHTML = jsonOBJ.subject.display;
+							row.insertCell(5).innerHTML = jsonOBJ.valueQuantity.value + jsonOBJ.valueQuantity.unit;
+							elLink1.href = 'http://203.64.84.213:20100/baseR4/'+ jsonOBJ.device.reference;
+							elLink1.innerHTML = jsonOBJ.device.reference;
+							row.insertCell(6).appendChild(elLink1);
+							i5++;
+						}
+						else{
+							alert( jsonOBJ.id + ' exist in the type of ' + jsonOBJ.code.coding[0].display);
+						}
+					}
+					if (selectedObs == 'Glucose' ){	
+						if ( jsonOBJ.code.coding[0].code == '15074-8' ){
+							var table= document.getElementById("Oobs");
+							if(i6==1){
+								table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Date</th><th>Patient ID</th><th>Patient Name</th><th>Glucose</th><th>Device ID</th></tr>';
+							}
+							var row = table.insertRow(-1);
+							var elLink = document.createElement('a');
+							var elLink1 = document.createElement('a');
+							row.insertCell(0).innerHTML = i6;
+							row.insertCell(1).innerHTML = jsonOBJ.id;
+							row.insertCell(2).innerHTML = jsonOBJ.meta.lastUpdated;
+							elLink.href = 'http://203.64.84.213:20100/baseR4/'+ jsonOBJ.subject.reference;
+							elLink.innerHTML = jsonOBJ.subject.reference;
+							row.insertCell(3).appendChild(elLink);
+							row.insertCell(4).innerHTML = jsonOBJ.subject.display;
+							row.insertCell(5).innerHTML = jsonOBJ.valueQuantity.value + jsonOBJ.valueQuantity.unit;
+							elLink1.href = 'http://203.64.84.213:20100/baseR4/'+ jsonOBJ.device.reference;
+							elLink1.innerHTML = jsonOBJ.device.reference;
+							row.insertCell(6).appendChild(elLink1);
+							i6++;
+						}
+						else{
+							alert( jsonOBJ.id + ' exist in the type of ' + jsonOBJ.code.coding[0].display);
+						}
+					}
+				}
+			}
+        }
+	</script>
+</body>
+</html>

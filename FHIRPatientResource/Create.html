@@ -1,0 +1,118 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Create - Patient's Data</title>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" /> 
+	<script src="FormToXML.js"></script>
+</head>
+   
+<body>
+	<header class="site-header">
+		<div class="clear"></div>
+			<div class="inner-wrap">
+
+				<div class="navbar-brand-wpz">
+					<a href="http://demo.wpzoom.com/foodica" title="Food Recipes Theme for WordPress">
+						<font size="10">Patient's Data</font>
+					</a>
+					
+				</div><!-- .navbar-brand -->
+			</div>
+		
+		<div id="mysticky-wrap" style="margin-bottom: 40px;">
+			<div id="mysticky-nav" style="top: -60px;" class="">
+				<nav class="main-navbar" role="navigation" style="">
+					<div class="inner-wrap">
+						<div id="navbar-main">
+							<div class="menu-main-container">
+								<ul id="menu-main-1" class="navbar-wpz dropdown sf-menu sf-js-enabled sf-arrows">
+									<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-has-children menu-item-207">
+										<a href="Create.html">Create</a>
+									</li>
+									<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-106"><a href="Read.html">Read</a></li>
+									<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-163"><a href="Search.html">Search</a></li>
+								</ul>
+							</div>
+						</div><!-- #navbar-main -->
+					</div><!-- ./inner-wrap -->
+				</nav>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</header>		
+	
+	<center>Resource :
+	<select id="resource">
+		<option>Choose</option>
+		<option>MedicationRequest</option>	
+		<option>Observation</option>
+		<option>Organization</option>	
+		<option>Patient</option>	
+	</select>
+	<div id="selectObs"></div>
+	<button onclick="showForm()">Enter</button></center><br>	
+	<div id='forms'></div>
+	
+	<script>
+		var count=0;
+		function showForm(){
+			var resourceID = document.getElementById('resource');
+			var selected = resourceID.options[resource.selectedIndex].text;
+			if (selected == 'Patient'){
+				reset();
+				count=0;
+				document.getElementById('forms').innerHTML = '<form id="form1"><table align="center" style="border: solid 2px gray;" ><tr><td>ID No. : <input type="text" name="identifier"><br></td></tr><tr><td>Name : <input type="text" name="name"><br></td></tr><tr><td>Gender : <input type="radio" name="gender" value="female"> Female <input type="radio" name="gender" value="male"> Male</td></tr><tr><td>Birth Date : <input type="date" name="birthDate"></td></tr><tr><td align="right"><input type="button" value="Send" onclick="checkdata()"></td></tr><tr><td><textarea id="output" rows="50" cols="50" value="word"></textarea></td></tr></table></form>';
+			}
+			if (selected == 'Organization'){
+				reset();
+				count=0;
+				document.getElementById('forms').innerHTML = '<form id="form1"><table align="center" style="border: solid 2px gray;" ><tr><td>Organization Type:<br><select name="code"><option title="empty">Code</option><option title="prov">Healthcare Provider</option><option title="dept">Hospital Department</option><option title="team">Organizational team</option><option title="govt">Government</option><option title="ins">Insurance Company</option><option title="edu">Educational Institute</option><option title="reli">Religious Institution</option><option title="crs">Clinical Research Sponsor</option><option title="cg">Community Group</option><option title="bus">Non-Healthcare Business or Corporation</option><option title="other">Other</option></select><br><input size="28" type="text" name="type"><br></td></tr><tr><td>Organization Name : <input type="text" name="name"><br></td></tr><tr><td>Contact Person : <select id="system" name="system"><option title="empty">Code</option><option title="phone">Phone</option><option title="fax">Fax</option><option title="email">Email</option><option title="pager">Pager</option><option title="url">Url</option><option title="sms">Sms</option><option title="other">Other</option><input type="text" name="telecom"><br></td></tr><tr><td>Address : <input type="text" name="postalCode" value="             [post code]"><input type="text" name="address" value="             [address]"></td></tr><tr><td align="right"><input type="button" value="Send" onclick="checkdata()"></td></tr><tr><td><textarea id="output" rows="50" cols="50" value="word"></textarea></td></tr></table></form>';
+			}
+			if (selected == 'MedicationRequest'){
+				reset();
+				count=0;
+				document.getElementById('forms').innerHTML = '<form id="form1"><table align="center" style="border: solid 2px gray;" ><tr><td>Identifier: <input type="text" name="identifier"><br></td></tr><tr><td>Patient Category: <select name="category"><option title="empty">Choose</option><option title="Inpatient">Inpatient</option><option title="Outpatient">Outpatient</option><option title="Community">Community</option></select><br><tr><td>Patient ID: <input size="28" type="text" name="pid"><br></td></tr><tr><td>Patient Name: <input type="text" name="pname"><br></td></tr><tr><td>Organization ID: <input type="text" name="oid"><br></td></tr><tr><td>Organization Name: <input type="text" name="oname"><br></td></tr><tr><td align="center">Dosage Instruction:</td></tr><tr><td>Additional Instruction: <input type="text" name="additionalInstruction"></td></tr><tr><td>Frequency: <select id="timing" name="timing"><option title="empty">Choose</option><option title="QD">Once a Day</option><option title="BID">Twice a Day</option><option title="TID">Three Times a Day</option><option title="QID">Four Times a Day</option><option title="other">Other</option></select></td></tr><tr><td>Routes of Drug Administration: <select id="route" name="route"><option title="empty">Choose</option><option title="PO">Oral</option><option title="INH">Inhalation</option><option title="INJ">Injection</option><option title="TOP">Topical</option><option title="other">Other</option></select></td></tr><tr><td align="right"><input type="button" value="Send" onclick="checkdata()"></td></tr><tr><td><textarea id="output" rows="50" cols="50" value="word"></textarea></td></tr></table></form>';
+			}
+			if (selected == 'Observation'){
+				if (count==0){
+					reset();
+					document.getElementById('selectObs').innerHTML= '<center>Type : <select id="ObsType"><option>Choose</option><option>BloodPressure</option><option>BodyTemperature</option><option>Glucose</option></select></center>';
+				}
+				count++;
+				var obsID=document.getElementById('ObsType');
+				var selectedObs= obsID.options[ObsType.selectedIndex].text;				
+				if (selectedObs == 'BloodPressure' ){	
+					document.getElementById('forms').innerHTML = '<form id="form1"><table align="center" style="border: solid 2px gray;" ><tr><td>Patient ID: <input type="text" name="pid"></td></tr><tr><td>Patient Name: <input type="text" name="pname"></td></tr><tr><td>Device ID: <input type="text" name="device"><br></td></tr><tr><td>Systolic blood pressure: <input type="text" name="8480-6"> mmHg<br></td></tr><tr><td>Diastolic blood pressure: <input type="text" name="8462-4"> mmHg<br></td></tr><tr><td align="right"><input type="button" value="Send" onclick="checkdata()"></td></tr><tr><td><textarea id="output" rows="50" cols="50" value="word"></textarea></td></tr></table></form>';
+				}
+				if (selectedObs == 'BodyTemperature' ){	
+					document.getElementById('forms').innerHTML = '<form id="form1"><table align="center" style="border: solid 2px gray;" ><tr><td>Patient ID: <input type="text" name="pid"></td></tr><tr><td>Patient Name: <input type="text" name="pname"></td></tr><tr><td>Temperature: <input type="text" name="valueQuantity"><div id="unit"> C</div></td></tr><tr><td>Device ID: <input type="text" name="device"><br></td></tr>><tr><td align="right"><input type="button" value="Send" onclick="checkdata()"></td></tr><tr><td><textarea id="output" rows="50" cols="50" value="word"></textarea></td></tr></table></form>';
+				}
+				if (selectedObs == 'Glucose' ){	
+					document.getElementById('forms').innerHTML = '<form id="form1"><table align="center" style="border: solid 2px gray;" ><tr><td>Patient ID: <input type="text" name="pid"></td></tr><tr><td>Patient Name: <input type="text" name="pname"></td></tr><tr><td>Glucose: <input type="text" name="valueQuantity"><div id="unit"> mg/dL</div></td></tr><tr><td>Device ID: <input type="text" name="device"><br></td></tr>><tr><td align="right"><input type="button" value="Send" onclick="checkdata()"></td></tr><tr><td><textarea id="output" rows="50" cols="50" value="word"></textarea></td></tr></table></form>';
+				}
+			}
+		}
+		
+		function reset(){
+			document.getElementById('forms').innerHTML="";
+			document.getElementById('selectObs').innerHTML="";
+		}
+		function checkdata()
+		{ 
+			var xmlStr;
+			var resourceID = document.getElementById('resource');
+			var selected = resourceID.options[resource.selectedIndex].text;
+			if (selected == 'Observation'){
+				var obsID=document.getElementById('ObsType');
+				var selectedObs= obsID.options[ObsType.selectedIndex].text;
+				xmlStr = formInputsToXML('form1',selected, selectedObs);
+			}
+			else { 
+				xmlStr = formInputsToXML('form1',selected, ''); 
+			}
+			postData(xmlStr, selected);
+		}
+	</script>
+</body>
+</html>

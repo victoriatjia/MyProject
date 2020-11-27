@@ -1,0 +1,339 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Search - Patient's Data</title>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" /> 
+	<script src="FormToXML.js"></script>
+</head>
+   
+<body>
+	<header class="site-header">
+		<div class="clear"></div>
+			<div class="inner-wrap">
+
+				<div class="navbar-brand-wpz">
+					<a href="http://demo.wpzoom.com/foodica" title="Food Recipes Theme for WordPress">
+						<font size="10">Patient's Data</font>
+					</a>
+					
+				</div><!-- .navbar-brand -->
+			</div>
+		
+		<div id="mysticky-wrap" style="margin-bottom: 40px;">
+			<div id="mysticky-nav" style="top: -60px;" class="">
+				<nav class="main-navbar" role="navigation" style="">
+					<div class="inner-wrap">
+						<div id="navbar-main">
+							<div class="menu-main-container">
+								<ul id="menu-main-1" class="navbar-wpz dropdown sf-menu sf-js-enabled sf-arrows">
+									<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-106"><a href="Create.html">Create</a></li>
+									<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-163"><a href="Read.html">Read</a></li>
+									<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-has-children menu-item-207">
+										<a href="Search.html">Search</a>
+									</li>
+								</ul>
+							</div>
+						</div><!-- #navbar-main -->
+					</div><!-- ./inner-wrap -->
+				</nav>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</header>	
+	
+	<center>Resource :
+				<select id="resource">
+					<option>Choose</option>
+					<option>MedicationRequest</option>	
+					<option>Observation</option>
+					<option>Organization</option>	
+					<option>Patient</option>	
+				</select>
+	</center>
+	
+	<center>Search data using parameter: <button onclick="addParameter()">add</button><br></center>
+	
+	<table id="parameter" align="center">
+		<tr>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td><b>Parameter</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><b>Value</b></td>
+			<td></td>
+		</tr>
+	</table>
+	
+	<table align="center">
+		<tr>
+			<td align="center">
+				<input type="button" value="show" onclick="showForm()">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				API: <input size="48" type="text" name="API" id="API"><br>
+			</td>
+		</tr>
+	</table>
+	<table id="Opatient" align="center" border="1"></table><br>
+	<table id="Oorganization" align="center" border="1"></table><br>
+	<table id="OMR" align="center" border="1"></table><br>
+	<table id="Oobs" align="center" border="1"></table><br>
+	<script>
+		var i=1;
+		function addParameter(){
+			var table = document.getElementById("parameter");
+			var row = table.insertRow(-1);
+			var cell1 = row.insertCell(0);
+			var cell2 = row.insertCell(1);
+			var cell3 = row.insertCell(2);
+			var cell4 = row.insertCell(3);
+			var cell5 = row.insertCell(4);
+			cell1.innerHTML = i;
+			cell2.innerHTML = '<input type="text">';
+			cell3.innerHTML = '=';
+			cell4.innerHTML = '<input type="text">';
+			cell5.innerHTML = '<button onclick="delParam(this)">delete</button>'
+			i++;
+        }		
+		
+		function delParam(row){
+			var index= row.parentNode.parentNode.rowIndex;
+			var table = document.getElementById('parameter');
+			var count = table.rows.length;
+			document.getElementById("parameter").deleteRow(index);
+			i--;
+			for (var c=index;c<count;c++){
+				document.getElementById("parameter").rows[c].cells[0].innerHTML=c;
+			}
+		}
+		
+		function showForm(){
+			var txt='';
+			var temp='';
+			var resourceID = document.getElementById('resource');
+			var selected = resourceID.options[resource.selectedIndex].text;
+			var table = document.getElementById('parameter');
+			var count = table.rows.length;
+			for (var i=1;i<count;i++){
+				temp += table.rows[i].cells[1].children[0].value + '=' + table.rows[i].cells[3].children[0].value;
+				if(i!=count-1){
+					temp+='&';
+				}
+			}
+			if (selected == 'Patient'){
+				txt = "http://startfhir.dicom.org.tw/fhir/Patient?" + temp ;
+				document.getElementById('API').value = txt;
+			}
+			if (selected == 'Organization'){
+				txt = "http://startfhir.dicom.org.tw/fhir/Organization?" + temp;
+				document.getElementById('API').value = txt;
+			}
+			if (selected == 'Observation'){
+				txt = "http://startfhir.dicom.org.tw/fhir/Observation?" + temp;
+				document.getElementById('API').value = txt;
+			}
+			if (selected == 'MedicationRequest'){
+				txt = "http://startfhir.dicom.org.tw/fhir/MedicationRequest?" + temp;
+				document.getElementById('API').value = txt;
+			}
+			var xhttp = new XMLHttpRequest();
+                xhttp.open("GET", txt, true);
+				//xhttp.setRequestHeader("Content-type", 'text/xml');
+                xhttp.onreadystatechange = function (){
+					//alert(this.readyState);
+                    if (this.readyState == 4){ 
+						showOuput(this.responseText);
+                    }
+                };
+                xhttp.send();
+		}
+		
+		var i1=1, i2=1, i3=1, i4=1, i5=1, i6=1;
+		function showOuput(str){
+			var resourceID = document.getElementById('resource');
+			var selected = resourceID.options[resource.selectedIndex].text;
+			var jsonOBJ =JSON.parse(str);
+			
+			if (jsonOBJ.total == 0){
+				alert('data unexist');
+			}
+			else{
+				if (selected=="Patient"){
+					var table= document.getElementById("Opatient");
+					if(i1==1){
+							table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Identifier</th><th>Name</th><th>Gender</th><th>Birth Date</th></tr>';
+						}
+					for (var i=0;i<((jsonOBJ.total>10)?10:jsonOBJ.total);i++){ 
+						var row = table.insertRow(-1);
+						row.insertCell(0).innerHTML = i1;
+						row.insertCell(1).innerHTML = jsonOBJ.entry[i].resource.id;
+						row.insertCell(2).innerHTML = jsonOBJ.entry[i].resource.identifier[0].value;
+						row.insertCell(3).innerHTML = jsonOBJ.entry[i].resource.name[0].text;
+						row.insertCell(4).innerHTML = jsonOBJ.entry[i].resource.gender;
+						row.insertCell(5).innerHTML = jsonOBJ.entry[i].resource.birthDate;
+						i1++;
+					}
+				}
+				if (selected=="Organization"){
+					var table= document.getElementById("Oorganization");
+					if(i2==1){
+						table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Organization Type</th><th>Organization Name</th><th>Contact Person</th><th>Address (Postal Code)</th></tr>';
+					}
+					for (var i=0;i<((jsonOBJ.total>10)?10:jsonOBJ.total);i++){
+						var row = table.insertRow(-1);
+						row.insertCell(0).innerHTML = i2;
+						row.insertCell(1).innerHTML = jsonOBJ.entry[i].resource.id;
+						row.insertCell(2).innerHTML = jsonOBJ.entry[i].resource.type[0].text;
+						row.insertCell(3).innerHTML = jsonOBJ.entry[i].resource.name;
+						row.insertCell(4).innerHTML = '(' + jsonOBJ.entry[i].resource.telecom[0].system + ') ' + jsonOBJ.entry[i].resource.telecom[0].value;
+						row.insertCell(5).innerHTML = jsonOBJ.entry[i].resource.address[0].text + ', ' + jsonOBJ.entry[i].resource.address[0].postalCode;
+						i2++;
+					}
+				}
+				if (selected=="MedicationRequest"){
+					var table= document.getElementById("OMR");
+					if(i3==1){
+						table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Patient Category</th><th>Patient ID</th><th>Patient Name</th><th>Additional Instruction</th><th>Frequency</th><th>Routes of Drug Administration</th></tr>';
+					}
+					for (var i=0;i<((jsonOBJ.total>10)?10:jsonOBJ.total);i++){
+						var row = table.insertRow(-1);
+						var elLink = document.createElement('a');
+						row.insertCell(0).innerHTML = i3;
+						row.insertCell(1).innerHTML = jsonOBJ.entry[i].resource.id;
+						row.insertCell(2).innerHTML = jsonOBJ.entry[i].resource.category[0].coding[0].code;
+						elLink.href = 'http://startfhir.dicom.org.tw/fhir/'+ jsonOBJ.entry[i].resource.subject.reference;
+						elLink.innerHTML = jsonOBJ.entry[i].resource.subject.reference;
+						row.insertCell(3).appendChild(elLink);
+						row.insertCell(4).innerHTML = jsonOBJ.entry[i].resource.subject.display;
+						//if (jsonOBJ.has(jsonOBJ.entry[i].resource.dosageInstruction[0].additionalInstruction[0])) {
+						row.insertCell(5).innerHTML = jsonOBJ.entry[i].resource.dosageInstruction[0].additionalInstruction[0].coding[0].display; 
+						row.insertCell(6).innerHTML = jsonOBJ.entry[i].resource.dosageInstruction[0].timing.code.coding[0].display;
+						row.insertCell(7).innerHTML = jsonOBJ.entry[i].resource.dosageInstruction[0].route.coding[0].display;
+						i3++;
+					}
+				}
+				
+				if (selected=="Observation"){
+					var table= document.getElementById("Oobs");
+						
+					for (var i=0;i<((jsonOBJ.total>10)?10:jsonOBJ.total);i++){	
+						if ( jsonOBJ.entry[i].resource.category[0].coding[0].code == 'vital-signs' ){
+							if ( jsonOBJ.entry[i].resource.code.coding[0].code == '85354-9' ){
+								if(i4==1){
+									table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Date</th><th>Patient ID</th><th>Patient Name</th><th>Systolic blood pressure</th><th>Diastolic blood pressure</th><th>Device ID</th></tr>';
+								}
+								var row = table.insertRow(-1);
+								var elLink = document.createElement('a');
+								var elLink1 = document.createElement('a');
+								row.insertCell(0).innerHTML = i4;
+								row.insertCell(1).innerHTML = jsonOBJ.entry[i].resource.id;
+								row.insertCell(2).innerHTML = jsonOBJ.entry[i].resource.meta.lastUpdated;
+								elLink.href = 'http://startfhir.dicom.org.tw/fhir/'+ jsonOBJ.entry[i].resource.subject.reference;
+								elLink.innerHTML = jsonOBJ.entry[i].resource.subject.reference;
+								row.insertCell(3).appendChild(elLink);
+								row.insertCell(4).innerHTML = jsonOBJ.entry[i].resource.subject.display;
+								row.insertCell(5).innerHTML = jsonOBJ.entry[i].resource.component[0].valueQuantity.value + jsonOBJ.entry[i].resource.component[0].valueQuantity.unit;
+								row.insertCell(6).innerHTML = jsonOBJ.entry[i].resource.component[1].valueQuantity.value + jsonOBJ.entry[i].resource.component[1].valueQuantity.unit;
+								elLink1.href = 'http://startfhir.dicom.org.tw/fhir/'+ jsonOBJ.entry[i].resource.device.reference;
+								elLink1.innerHTML = jsonOBJ.entry[i].resource.device.reference;
+								row.insertCell(7).appendChild(elLink1);
+								i4++;
+							}		
+										
+							if ( jsonOBJ.entry[i].resource.code.coding[0].code == '8310-5' ){
+								if(i5==1){
+									table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Date</th><th>Patient ID</th><th>Patient Name</th><th>Temperature</th><th>Device ID</th></tr>';
+								}
+								var row = table.insertRow(-1);
+								var elLink = document.createElement('a');
+								var elLink1 = document.createElement('a');
+								row.insertCell(0).innerHTML = i5;
+								row.insertCell(1).innerHTML = jsonOBJ.entry[i].resource.id;
+								row.insertCell(2).innerHTML = jsonOBJ.entry[i].resource.meta.lastUpdated;
+								elLink.href = 'http://startfhir.dicom.org.tw/fhir/'+ jsonOBJ.entry[i].resource.subject.reference;
+								elLink.innerHTML = jsonOBJ.entry[i].resource.subject.reference;
+								row.insertCell(3).appendChild(elLink);
+								row.insertCell(4).innerHTML = jsonOBJ.entry[i].resource.subject.display;
+								row.insertCell(5).innerHTML = jsonOBJ.entry[i].resource.valueQuantity.value + jsonOBJ.entry[i].resource.valueQuantity.unit;
+								elLink1.href = 'http://startfhir.dicom.org.tw/fhir/'+ jsonOBJ.entry[i].resource.device.reference;
+								elLink1.innerHTML = jsonOBJ.entry[i].resource.device.reference;
+								row.insertCell(6).appendChild(elLink1);
+								i5++;
+							}
+							
+							if ( jsonOBJ.entry[i].resource.code.coding[0].code == '15074-8' ){
+								if(i6==1){
+									table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Date</th><th>Patient ID</th><th>Patient Name</th><th>Glucose</th><th>Device ID</th></tr>';
+								}	
+								var row = table.insertRow(-1);
+								var elLink = document.createElement('a');
+								var elLink1 = document.createElement('a');
+								row.insertCell(0).innerHTML = i6;
+								row.insertCell(1).innerHTML = jsonOBJ.entry[i].resource.id;
+								row.insertCell(2).innerHTML = jsonOBJ.entry[i].resource.meta.lastUpdated;
+								elLink.href = 'http://startfhir.dicom.org.tw/fhir/'+ jsonOBJ.entry[i].resource.subject.reference;
+								elLink.innerHTML = jsonOBJ.entry[i].resource.subject.reference;
+								row.insertCell(3).appendChild(elLink);
+								row.insertCell(4).innerHTML = jsonOBJ.entry[i].resource.subject.display;
+								row.insertCell(5).innerHTML = jsonOBJ.entry[i].resource.valueQuantity.value + jsonOBJ.entry[i].resource.valueQuantity.unit;
+								elLink1.href = 'http://startfhir.dicom.org.tw/fhir/'+ jsonOBJ.entry[i].resource.device.reference;
+								elLink1.innerHTML = jsonOBJ.entry[i].resource.device.reference;
+								row.insertCell(6).appendChild(elLink1);
+								i6++;
+							}	
+						}
+						
+						if ( jsonOBJ.entry[i].resource.category[0].coding[0].code == 'imaging' ){
+							if ( jsonOBJ.entry[i].resource.code.coding[0].code == 'brain' ){
+								if(i6==1){
+									table.innerHTML= '<tr><th>No.</th><th>ID. Register</th><th>Date</th><th>UID</th><th>SVG</th><th>ViewPort.sx</th><th>ViewPort.sy</th><th>ViewPort.sw</th><th>ViewPort.sh</th><th>Window Center</th><th>Window Width</th></tr>';
+								}	
+								var row = table.insertRow(-1);
+								var elLink = document.createElement('a');
+								var elLink1 = document.createElement('a');
+								row.insertCell(0).innerHTML = i6;
+								row.insertCell(1).innerHTML = jsonOBJ.entry[i].resource.id;
+								row.insertCell(2).innerHTML = jsonOBJ.entry[i].resource.meta.lastUpdated;
+								row.insertCell(3).innerHTML = jsonOBJ.entry[i].resource.identifier[0].value;
+								var svgstr= window.atob(jsonOBJ.entry[i].resource.component[0].valueString);
+								alert(svgstr);
+								var subSVG=svgstr.split("<");
+								var str="";
+								for (var j=1; j<subSVG.length; j++)	{
+									if(subSVG[j].startsWith("line"))
+									{
+										var subLine=subSVG[j].split('="');
+										for (var k=1; k<subLine.length; k++)
+										{
+											str+= subLine[k].substring(0, subLine[k].indexOf('"')) + ",";
+										}
+									}
+									else if(subSVG[j].startsWith("rect"))
+									{
+										var subLine=subSVG[j].split('="');
+										for (var k=1; k<subLine.length; k++)
+										{
+											str+= subLine[k].substring(0, subLine[k].indexOf('"')) + ",";
+										}
+									}
+								}
+								//row.insertCell(4).innerHTML = window.atob(jsonOBJ.entry[i].resource.component[0].valueString); //Show annotation line & rectangle
+								row.insertCell(4).innerHTML = str;																 //Show annotation x1, y1, x2, y2
+								row.insertCell(5).innerHTML = jsonOBJ.entry[i].resource.component[1].valueString;
+								row.insertCell(6).innerHTML = jsonOBJ.entry[i].resource.component[2].valueString;
+								row.insertCell(7).innerHTML = jsonOBJ.entry[i].resource.component[3].valueString;
+								row.insertCell(8).innerHTML = jsonOBJ.entry[i].resource.component[4].valueString;
+								row.insertCell(9).innerHTML = jsonOBJ.entry[i].resource.component[5].valueString;
+								row.insertCell(10).innerHTML = jsonOBJ.entry[i].resource.component[6].valueString;
+								i6++;
+							}
+						}
+					}	
+				}
+			}
+        }		
+	</script>
+</body>
+</html>
