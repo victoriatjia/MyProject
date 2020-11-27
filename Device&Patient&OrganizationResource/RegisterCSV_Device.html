@@ -1,0 +1,70 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Register by Uploading CSV File - Device</title>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" /> 
+	<script src="FormToXML.js"></script>
+</head>
+   
+<body>
+	<header class="site-header">
+		<div class="clear"></div>
+			<div class="inner-wrap">
+				<div class="navbar-brand-wpz">
+					<a href="Register_Organization.html">
+						<font size="10">Device Registration by Uploading CSV File</font>
+					</a>
+				</div>
+			</div>
+	</header>	
+	
+	<form class="contact100-form" id="form1" name="form1" method="put">
+		<table align="center" style="border: solid 2px gray;" >
+			<tr>
+				<td><input type="file" name="file" accept=".csv" /></td>
+			</tr>
+			<tr>
+				<td align="center"><input style="width:100%" type="button" value="Send" onclick="uploadAndSubmit()"></td>
+			</tr>
+		</table>
+	</form>
+
+<script>
+function uploadAndSubmit() { 
+		var form = document.forms["form1"];
+		var file = form["file"].files[0];
+		var fileReader = new FileReader();
+		fileReader.onload = function() {
+			var contents = event.target.result;
+			SplitData(contents);
+		};
+		fileReader.readAsText(file);
+}
+
+function SplitData(output) {
+	var output, c=0, count=0, temp= new Array(100), arry= new Array(15);
+   	var newline=output.split("\n");
+	newline.forEach(function(output) {
+		//alert(output);
+		var res = output.split(",");
+		res.forEach(function(value){
+		temp[c]=value;
+			c++;
+		});
+	});	
+	
+	var index=c/6;
+	for(var i=1;i<=index;i++){
+			for(var j=0;j<6;j++){
+				arry[j]=temp[count];
+				count++;
+			}
+			//alert(i + ". " + arry[0] + ' ' + arry[1] + ' ' + arry[2] + ' ' + arry[3] + ' ' + arry[4] + ' ' + arry[5]);
+			if(i>1)
+			csvToxml("Device", arry);
+	}
+}
+</script>
+</body>
+</html>

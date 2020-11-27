@@ -1,0 +1,111 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Register - Organization</title>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" /> 
+	<script src="FormToXML.js"></script>
+</head>
+   
+<body>
+	<header class="site-header">
+		<div class="clear"></div>
+			<div class="inner-wrap">
+				<div class="navbar-brand-wpz">
+					<a href="Register_Organization.html">
+						<font size="10">Organization's Registration</font>
+					</a>
+				</div>
+			</div>
+	</header>	
+	
+	<form class="contact100-form" id="form1" name="form1" method="put">
+		<table align="center" style="border: solid 2px gray;" >
+			<tr>
+				<td>Organization ID<font color="red"> *</font> <input type="text" name="id" style="margin-left:73px" size="30"><br></td>
+			</tr>
+			<tr>
+				<td>Organization Additional ID<input type="text" name="identifier" style="margin-left:15px" size="30"><br></td>
+			</tr>
+			<tr><td>Organization Type
+				<select name="code" style="margin-left:69px; width:300px;">
+					<option title="empty" align="center">--Select--</option>
+					<option title="prov">Healthcare Provider</option>
+					<option title="dept">Hospital Department</option>
+					<option title="team">Organizational team</option>
+					<option title="govt">Government</option>
+					<option title="ins">Insurance Company</option>
+					<option title="edu">Educational Institute</option>
+					<option title="reli">Religious Institution</option>
+					<option title="crs">Clinical Research Sponsor</option>
+					<option title="cg">Community Group</option>
+					<option title="bus">Non-Healthcare Business or Corporation</option>
+					<option title="other">Other</option></select
+			</td></tr>
+			<tr>
+				<td>Organization Name<font color="red"> *</font> <input type="text" name="name" style="margin-left:51px" size="30"><br></td>
+			</tr>
+			<tr>
+				<td>Organization Alias<input type="text" name="alias" style="margin-left:70px" size="30"><br></td>
+			</tr>
+			<tr>
+				<td>Address<font color="red"> *</font><input type="text" name="address" style="margin-left:127px" size="30"></td>
+			</tr>
+			<tr>
+				<td>Postal Code<font color="red"> *</font><input type="text" name="postalCode" style="margin-left:102px" size="30"></td>
+			</tr>
+			<tr>
+				<td>Person in Charge's Name<font color="red"> *</font> <input type="text" name="given" style="margin-left:14px" size="30"></td>
+			</tr>
+			<tr>
+				<td>Phone <input type="number" id="phone" name="phone" style="margin-left:146px; width:301px;"><br></td>
+			</tr>
+			<tr>
+				<td>Email <input type="email" name="email" style="margin-left:147px; width:301px;"><br></td>
+			</tr>
+			<tr>
+				<td align="center"><input style="width:100%" type="button" value="Send" onclick="validateForm();"></td>
+			</tr>
+		</table>
+	</form>
+			
+	<script>
+		function validateForm()
+		{ 	
+			if(document.form1.email.value!=''){
+				var x = document.form1.email.value;
+				var atpos = x.indexOf("@");
+				var dotpos = x.lastIndexOf(".");
+				if (atpos<1 || dotpos<atpos+2 || dotpos+2>=x.length) {
+					alert("Not a valid e-mail address");
+					return false;
+				}
+			}
+			
+			if(document.form1.id.value==''){
+				alert("Organization ID must be filled out");
+				return (false);
+			}
+			if(document.form1.name.value==''){
+				alert("Organization Name must be filled out");
+				return (false);
+			}
+			if(document.form1.address.value==''){
+				alert("Address must be filled out");
+				return (false);
+			}
+			if(document.form1.postalCode.value==''){
+				alert("Postal Code must be filled out");
+				return (false);
+			}
+			if(document.form1.given.value==''){
+				alert("Person in Charge's Name must be filled out");
+				return (false);
+			}
+			
+			formInputsToXML('form1','Organization');
+			
+		}
+	</script>
+</body>
+</html>

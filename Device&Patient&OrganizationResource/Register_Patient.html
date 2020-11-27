@@ -1,0 +1,94 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Register - Patient</title>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" /> 
+	<script src="FormToXML.js"></script>
+</head>
+   
+<body>
+	<header class="site-header">
+		<div class="clear"></div>
+			<div class="inner-wrap">
+				<div class="navbar-brand-wpz">
+					<a href="Register_Organization.html">
+						<font size="10">Patient's Registration</font>
+					</a>
+				</div>
+			</div>
+	</header>	
+	
+	<form class="contact100-form" id="form1" name="form1" method="put">
+		<table align="center" style="border: solid 2px gray;" >
+			<tr>
+				<td>Patient ID<font color="red"> *</font> <input type="text" name="id" maxlength="100" style="margin-left:80px" size="30"><br></td>
+			</tr>
+			<tr>
+				<td>Registration No. <input type="text" name="identifier" style="margin-left:52px" size="30"><br></td>
+			</tr>
+			<tr>
+				<td>Patient Name<font color="red"> *</font> <input type="text" name="name" style="margin-left:58px" size="30"></td>
+			</tr>
+			<tr>
+				<td>Phone <input type="number" id="phone" name="phone" style="margin-left:116px; width:301px;" size="30"><br></td>
+			</tr>
+			<tr>
+				<td>Email <input type="email" name="email" style="margin-left:118px" size="30"><br></td>
+			</tr>
+			<tr>
+				<td>Address<input type="text" name="address" style="margin-left:108px" size="30"></td>
+			</tr>
+			<tr>
+				<td>Postal Code<input type="text" name="postalCode" style="margin-left:83px" size="30"></td>
+			</tr>
+			<tr>
+				<td>Gender<font color="red"> *</font> <input style="margin-left:95px" type="radio" name="gender" id="female" value="female"> Female <input type="radio" id="male" name="gender" value="male"> Male</td>
+			</tr>
+			<tr>
+				<td>Birth Date<font color="red"> *</font> <input type="date" name="birthDate" style="margin-left:75px; width:301px;"></td>
+			</tr>
+			
+			<tr>
+				<td align="center"><input style="width:100%" type="button" value="Send" onclick="validateForm();"></td>
+			</tr>
+		</table>
+	</form>
+			
+	<script>
+		function validateForm()
+		{ 	
+			if(document.form1.email.value!=''){
+				var x = document.form1.email.value;
+				var atpos = x.indexOf("@");
+				var dotpos = x.lastIndexOf(".");
+				if (atpos<1 || dotpos<atpos+2 || dotpos+2>=x.length) {
+					alert("Not a valid e-mail address");
+					return false;
+				}
+			}
+			
+			if(document.getElementById("female").checked==false && document.getElementById("male").checked==false){
+				alert("Gender must be filled out");
+				return (false);
+			}
+			
+			if(document.form1.id.value==''){
+				alert("Patient ID must be filled out");
+				return (false);
+			}
+			if(document.form1.name.value==''){
+				alert("Patient Name must be filled out");
+				return (false);
+			}
+			if(document.form1.birthDate.value==''){
+				alert("Birth Date must be filled out");
+				return (false);
+			}
+			
+			formInputsToXML('form1','Patient');
+			
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Register - Device</title>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" /> 
+	<script src="FormToXML.js"></script>
+	<style>
+	.topright1{
+		position:absolute;
+		top:0;
+		right:10;
+	}
+	.topright2{
+		position:absolute;
+		top:0;
+		right:80;
+	}
+	.topleft1{
+		position:absolute;
+		top:0;
+		left:10;
+	}
+	.topleft2{
+		position:absolute;
+		top:0;
+		left:100;
+	}
+	</style>
+</head>
+   
+<body>
+	<header class="site-header">
+		<div class="clear"></div>
+			<div class="inner-wrap">
+				<div class="navbar-brand-wpz" id="header">
+					<font size="10"></font>
+				</div>
+			</div>
+			<!-- <a class="topleft1" href="Register_Organization_Bilingual.html">Organization</a>
+			<a class="topleft2" href="Register_Patient_Bilingual.html">Patient</a> -->
+			<a class="topright1" onclick='SwitchLang("EN")'>English</a>
+			<a class="topright2" onclick='SwitchLang("CH")'>繁體中文</a>
+	</header>	
+	
+	<div id="forms"></div>		
+			
+	<script>
+		var Lang_EN = ["Device's Registration", "Device ID", "Device UDI", "Device Name", "Device Type Code", "Manufacture Date", "Device Model", "Send"]; 
+		var Lang_CH = ["儀器註冊","儀器序號", "儀器 UDI", "儀器全名", "儀器種類編碼", "生產製造日期", "產品型號", "送出"]; 
+		var LangArr;
+		
+		if (getCookie("userlang") == "") {
+			LangArr= Lang_CH;
+		}
+		else if (getCookie("userlang") != "") {		
+			if (getCookie("userlang")=="EN"){
+				LangArr= Lang_EN;
+				setCookie("userlang", "EN", 30);
+			}
+			if (getCookie("userlang")=="CH"){
+				LangArr= Lang_CH;
+				setCookie("userlang", "CH", 30);
+			}
+		}
+		document.getElementById('header').innerHTML="<font size='10'>" + LangArr[0] + "</font>";
+		document.getElementById('forms').innerHTML='<form class="contact100-form" id="form1" name="form1"><table align="center" style="border: solid 2px gray;"><tr><td>' + LangArr[1] + '<font color="red"> *</font><br><input type="text" name="id" size="50"><br></td></tr><tr><td>' + LangArr[2] + '<br><input type="text" name="deviceIdentifier" size="50"><br></td></tr><tr><td>' + LangArr[3] + '<font color="red"> *</font><br><input type="text" name="name" size="50"></td></tr><tr><td>' + LangArr[4] + '<font color="red"> *</font><br><input type="text" name="type" size="50"><br></td></tr><tr><td>' + LangArr[5] + '<font color="red"> *</font><br><input type="datetime-local" name="manufactureDate" size="30"><br></td></tr><tr><td>' + LangArr[6] + '<br><input type="text" name="model" size="50"></td></tr><tr><td align="center"><input style="width:100%" type="button" value="' + LangArr[7] + '" onclick="validateForm()"></td></tr></table></form>';	
+			
+		function SwitchLang(choosen){
+			setCookie("userlang", choosen, 30);
+			if (choosen=="EN")
+				LangArr= Lang_EN;
+			if (choosen=="CH")
+				LangArr= Lang_CH;				
+			document.getElementById('header').innerHTML="<font size='10'>" + LangArr[0] + "</font>";
+			document.getElementById('forms').innerHTML='<form class="contact100-form" id="form1" name="form1"><table align="center" style="border: solid 2px gray;"><tr><td>' + LangArr[1] + '<font color="red"> *</font><br><input type="text" name="id" size="50"><br></td></tr><tr><td>' + LangArr[2] + '<br><input type="text" name="deviceIdentifier" size="50"><br></td></tr><tr><td>' + LangArr[3] + '<font color="red"> *</font><br><input type="text" name="name" size="50"></td></tr><tr><td>' + LangArr[4] + '<font color="red"> *</font><br><input type="text" name="type" size="50"><br></td></tr><tr><td>' + LangArr[5] + '<font color="red"> *</font><br><input type="datetime-local" name="manufactureDate" size="30"><br></td></tr><tr><td>' + LangArr[6] + '<br><input type="text" name="model" size="50"></td></tr><tr><td align="center"><input style="width:100%" type="button" value="' + LangArr[7] + '" onclick="validateForm()"></td></tr></table></form>';	
+		}
+		
+		function validateForm()
+		{ 	
+			var choosenLang=getCookie("userlang");
+			if(document.form1.id.value==''){
+				if(choosenLang=="EN")
+					alert("Device ID must be filled out");
+				else if(choosenLang=="CH")
+					alert("儀器序號尚未填寫");
+				return (false);
+			}
+			if(document.form1.name.value==''){
+				if(choosenLang=="EN")
+					alert("Device Name must be filled out");
+				else if(choosenLang=="CH")
+					alert("儀器全名尚未填寫");
+				return (false);
+			}
+			if(document.form1.manufactureDate.value==''){
+				if(choosenLang=="EN")
+					alert("Manufacture Date must be filled out");
+				else if(choosenLang=="CH")
+					alert("生產製造日期尚未填寫")
+				return (false);
+			}
+			if(document.form1.type.value==''){
+				if(choosenLang=="EN")
+					alert("Device Type Code must be filled out");
+				else if(choosenLang=="CH")
+					alert("儀器種類編碼尚未填寫");
+				return (false);
+			}
+			formInputsToXML('form1','Device');
+		}
+		
+		function setCookie(cname, cvalue, exmin) {
+			var d = new Date();
+			d.setTime(d.getTime() + (exmin * 60 * 1000));
+			var expires = "expires="+d.toUTCString();
+			document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+		}
+
+		function getCookie(cname) {
+			var name = cname + "=";
+			var ca = document.cookie.split(';');
+			for(var i = 0; i < ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0) == ' ') {
+					c = c.substring(1);
+				}
+				if (c.indexOf(name) == 0) {
+					return c.substring(name.length, c.length);
+				}
+			}
+			return "";
+		}
+	</script>
+</body>
+</html>
